@@ -1,6 +1,6 @@
-# ./changeWriteCapacityUnit.sh table_name no_of_write_capacity_units
+# bash changeWriteCapacityUnit.sh table_name no_of_write_capacity_units
 # this script is used to change the number of WriteCapacityUnits in dynamodb. It returns with 0 in case of failure
-aws dynamodb update-table --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=$2 --table-name $1 || return 1
+aws dynamodb update-table --provisioned-throughput ReadCapacityUnits=1,WriteCapacityUnits=$2 --table-name $1 || exit 1
 
 while [ "$(aws dynamodb describe-table --table-name $1 --query 'Table.[TableStatus]' --output text)" = "UPDATING" ]
 do 
@@ -17,12 +17,12 @@ if [ "$TableStatus" = "ACTIVE" ]
 if [ "$WriteCapacityUnits" = "$2" ]
         then
             echo "WriteCapacityUnit Successfully changed"
-            return 0
+            exit 0
         else
 	        echo "WriteCapacityUnits are not updated!!!"
-            return 1
+            exit 1
         fi
 else
     echo "Something went wrong. TableStatus not active"
-    return 1
+    exit 1
 fi
